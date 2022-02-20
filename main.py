@@ -26,15 +26,17 @@ if __name__ == '__main__':
     screen.blit(background, (0, 0))
 
     # create font of hint for the number of timber
-    timber_num = 0
+    timber_value = 0.0  # value of single timber
+    timber_profit = 0.0  # total profit
     timber_num_font = pygame.font.SysFont('arial', 50)
-    tn_surface = timber_num_font.render(r'Timber: ' + str(timber_num), False, (130, 182, 217))
+    tn_surface = timber_num_font.render(r'Timber: ' + str(timber_profit), False, (130, 182, 217))
     screen.blit(tn_surface, (50, 620))
 
     # create timber
-    got_timber = False
+    got_timber, got_timbers = False, False
     timber = RigidBody(os.getcwd() + r'\assets\timber.png')
     timber.set_acceleration(0.001)
+    timbers = []  # store all timbers
 
     # get stump frames
     stump_frames = [
@@ -68,6 +70,10 @@ if __name__ == '__main__':
     for i in range(10):
         for j in range(10):
             tree = trees[i][j]
+            tree.age = float(random.randint(-1, 7))  # random generation
+            if tree.age == -1.0:
+                tree.is_chopped = True
+                tree.set_frames(stump_frames)
             tree.resize(45, 45)
             tree.set_pos((i*60+7, j*60+4))
             screen.blit(tree.image, tree.rect)
@@ -116,14 +122,137 @@ if __name__ == '__main__':
                         select_cursor.move(60, 0)
                 elif event.key == pygame.K_c:  # chop down tree
                     row_num, col_num = round(select_cursor.rect.x / 60), round(select_cursor.rect.y / 60)
-                    trees[row_num][col_num].set_frames(stump_frames)
-                    trees[row_num][col_num].is_chopped = True
-                    trees[row_num][col_num].age = -1  # just represent there should not have age
-                    got_timber = True
-                    timber.set_speed(0.0)
-                    timber.set_acceleration(0.001)
-                    timber.set_pos((select_cursor.rect.x + 15, select_cursor.rect.y + 15))
-                    timber.set_start_end_pos((select_cursor.rect.x + 15, select_cursor.rect.y + 15), (100, 630))
+                    tree = trees[row_num][col_num]
+                    if not tree.is_chopped:
+                        tree.set_frames(stump_frames)
+                        tree.is_chopped = True
+                        timber_value = tree.get_timber_value(tree.age)
+                        tree.age = -1.0  # just represent there should not have age
+                        got_timber = True
+                        timber.set_speed(0.0)
+                        timber.set_acceleration(0.001)
+                        timber.set_pos((select_cursor.rect.x + 15, select_cursor.rect.y + 15))
+                        timber.set_start_end_pos((select_cursor.rect.x + 15, select_cursor.rect.y + 15), (100, 630))
+                elif event.key == pygame.K_0:  # chop down all trees with age 0
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 0.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(0.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_1:  # chop down all trees with age 1
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 1.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(1.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_2:  # chop down all trees with age 2
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 2.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(2.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_3:  # chop down all trees with age 3
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 3.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(3.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_4:  # chop down all trees with age 4
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 4.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(4.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_5:  # chop down all trees with age 5
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 5.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(5.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_6:  # chop down all trees with age 6
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 6.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(6.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
+                elif event.key == pygame.K_7:  # chop down all trees with age 7
+                    for row in trees:
+                        for tree in row:
+                            if tree.age == 7.0:
+                                tree.set_frames(stump_frames)
+                                tree.is_chopped = True
+                                timber_value = tree.get_timber_value(7.0)
+                                tree.age = -1.0
+                                got_timbers = True
+                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timber = timbers[-1]
+                                timber.set_acceleration(0.001)
+                                timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
+                                timber.set_start_end_pos((tree.rect.x + 15, tree.rect.y + 15),
+                                                         (100, 630))
                 elif event.key == pygame.K_n:  # to next year
                     # all trees that are not chopped get one year older, except for those reached the maximal age,
                     # they keep no change. Trees with maximal age will seed around itself, these seeds will influence
@@ -162,7 +291,7 @@ if __name__ == '__main__':
 
         # render fonts under forest map, mostly used for hints
         screen.fill((0, 0, 0), (0, 600, 600, 100))
-        tn_surface = timber_num_font.render(r'Timber: ' + str(timber_num), False, (130, 182, 217))
+        tn_surface = timber_num_font.render(r'Profit: ' + str(timber_profit), False, (130, 182, 217))
         screen.blit(tn_surface, (50, 620))
 
         # render trees
@@ -179,9 +308,18 @@ if __name__ == '__main__':
         if got_timber:
             timber.smooth_slide(dt)
             screen.blit(timber.image, timber.rect)
-            if timber.rect.center[1] > 630:
+            if timber.rect.center[1] > 620:
                 got_timber = False
-                timber_num += 1
+                timber_profit += timber_value
+        elif got_timbers:
+            for timber in timbers:
+                timber.smooth_slide(dt)
+                screen.blit(timber.image, timber.rect)
+                if timber.rect.center[1] > 610:
+                    timbers.remove(timber)
+                    timber_profit += timber_value
+            if len(timbers) == 0:
+                got_timbers = False
 
         # render select cursor
         select_cursor.update(dt, t)

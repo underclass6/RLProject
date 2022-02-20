@@ -141,4 +141,20 @@ class Tree(AnimeObject):
         self.is_chopped = False  # if this tree is chopped, set True, otherwise, set False
         self.age = 0.0  # the age of this tree
         self.maximal_age = 7.0  # we assume that trees won't grow anymore when they reach a certain age
-        self.timber_value = 0.0  # the value(selling price) of this tree wrt. age
+        self.timber_value = {
+            '-1.0': 0.0,
+            '0.0': 0.0,
+            '1.0': 1.0,
+            '2.0': 3.0,
+            '3.0': 6.0,
+            '4.0': 10.0,
+            '5.0': 15.0,
+            '6.0': 23.0,
+            '7.0': 30.0
+        }  # the value(selling price) of this tree wrt. age
+
+    def get_timber_value(self, age):
+        if isinstance(age, str):
+            return self.timber_value[age]
+        else:
+            return self.timber_value[str(age)]
