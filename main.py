@@ -15,7 +15,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     # create ground
-    ground_paths = [os.getcwd() + r'\assets\PixelTrees\ground' + str(i+1) + '.png' for i in range(4)]
+    ground_paths = [os.getcwd() + r'/assets/PixelTrees/ground' + str(i+1) + '.png' for i in range(4)]
     background = pygame.surface.Surface((600, 600))
     for i in range(10):
         for j in range(10):
@@ -40,26 +40,26 @@ if __name__ == '__main__':
 
     # create timber
     got_timber, got_timbers = False, False
-    timber = RigidBody(os.getcwd() + r'\assets\timber.png')
+    timber = RigidBody(os.getcwd() + r'/assets/timber.png')
     timber.set_acceleration(0.001)
     timbers = []  # store all timbers
 
     # get stump frames
     stump_frames = [
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile000.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile001.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile002.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile003.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile004.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\PixelTrees\gif\stump\tile005.png').convert_alpha()
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile000.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile001.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile002.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile003.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile004.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/PixelTrees/gif/stump/tile005.png').convert_alpha()
     ]
 
     # get tree frames
     tree_frames = [
-        pygame.image.load(os.getcwd() + r'\assets\trees-blackland\tree4\tree4_00.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\trees-blackland\tree4\tree4_01.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\trees-blackland\tree4\tree4_02.png').convert_alpha(),
-        pygame.image.load(os.getcwd() + r'\assets\trees-blackland\tree4\tree4_03.png').convert_alpha()
+        pygame.image.load(os.getcwd() + r'/assets/trees-blackland/tree4/tree4_00.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/trees-blackland/tree4/tree4_01.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/trees-blackland/tree4/tree4_02.png').convert_alpha(),
+        pygame.image.load(os.getcwd() + r'/assets/trees-blackland/tree4/tree4_03.png').convert_alpha()
     ]
 
     # create trees
@@ -68,10 +68,10 @@ if __name__ == '__main__':
         trees.append([])
         for _ in range(10):
             trees[-1].append(Tree([
-                os.getcwd() + r'\assets\trees-blackland\tree4\tree4_00.png',
-                os.getcwd() + r'\assets\trees-blackland\tree4\tree4_01.png',
-                os.getcwd() + r'\assets\trees-blackland\tree4\tree4_02.png',
-                os.getcwd() + r'\assets\trees-blackland\tree4\tree4_03.png'
+                os.getcwd() + r'/assets/trees-blackland/tree4/tree4_00.png',
+                os.getcwd() + r'/assets/trees-blackland/tree4/tree4_01.png',
+                os.getcwd() + r'/assets/trees-blackland/tree4/tree4_02.png',
+                os.getcwd() + r'/assets/trees-blackland/tree4/tree4_03.png'
             ], random.randint(2, 10)))
     for i in range(10):
         for j in range(10):
@@ -93,12 +93,12 @@ if __name__ == '__main__':
 
     # create select cursor
     select_cursor = AnimeObject([
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile000.png',
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile001.png',
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile002.png',
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile003.png',
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile004.png',
-        os.getcwd() + r'\assets\PixelTrees\gif\selectcursor\tile005.png'
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile000.png',
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile001.png',
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile002.png',
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile003.png',
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile004.png',
+        os.getcwd() + r'/assets/PixelTrees/gif/selectcursor/tile005.png'
     ])
     select_cursor.resize(65, 65)
     select_cursor.set_pos((-3, -3))
@@ -148,7 +148,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(0.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -163,7 +163,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(1.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -178,7 +178,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(2.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -193,7 +193,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(3.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -208,7 +208,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(4.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -223,7 +223,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(5.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -238,7 +238,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(6.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
@@ -253,7 +253,7 @@ if __name__ == '__main__':
                                 timber_value = tree.get_timber_value(7.0)
                                 tree.age = -1.0
                                 got_timbers = True
-                                timbers.append(RigidBody(os.getcwd() + r'\assets\timber.png'))
+                                timbers.append(RigidBody(os.getcwd() + r'/assets/timber.png'))
                                 timber = timbers[-1]
                                 timber.set_acceleration(0.001)
                                 timber.set_pos((tree.rect.x + 15, tree.rect.y + 15))
