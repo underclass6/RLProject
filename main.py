@@ -32,6 +32,12 @@ if __name__ == '__main__':
     tn_surface = timber_num_font.render(r'Timber: ' + str(timber_profit), False, (130, 182, 217))
     screen.blit(tn_surface, (50, 620))
 
+    # the number of year and its font
+    year_num = 0
+    year_num_font = pygame.font.SysFont('arial', 50)
+    year_num_font_surface = year_num_font.render(r'Year: ' + str(year_num), False, (130, 182, 217))
+    screen.blit(year_num_font_surface, (400, 620))
+
     # create timber
     got_timber, got_timbers = False, False
     timber = RigidBody(os.getcwd() + r'\assets\timber.png')
@@ -258,6 +264,7 @@ if __name__ == '__main__':
                     # they keep no change. Trees with maximal age will seed around itself, these seeds will influence
                     # the soil without tree and new trees will grow up on those. However, soil in which there are trees
                     # alive will not be influenced by seeds.
+                    year_num += 1
                     soil_with_seeds_pos = set()  # a set consists of all positions of soil with seeds
                     for i, row in enumerate(trees):
                         for j, tree in enumerate(row):
@@ -289,10 +296,14 @@ if __name__ == '__main__':
         # render background
         screen.blit(background, background.get_rect())
 
-        # render fonts under forest map, mostly used for hints
+        # render fonts under forest map
         screen.fill((0, 0, 0), (0, 600, 600, 100))
         tn_surface = timber_num_font.render(r'Profit: ' + str(timber_profit), False, (130, 182, 217))
         screen.blit(tn_surface, (50, 620))
+
+        # render fonts of the number of the year
+        year_num_font_surface = year_num_font.render(r'Year: ' + str(year_num), False, (130, 182, 217))
+        screen.blit(year_num_font_surface, (400, 620))
 
         # render trees
         for row in trees:
