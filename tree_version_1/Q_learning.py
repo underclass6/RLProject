@@ -14,25 +14,11 @@ DISCOUNT_FACTOR = 1
 BINS = 20
 NUM_STATES = BINS ** 4
 
-CART_POSITION = np.linspace(-4.8, 4.8, BINS)
-CART_VELOCITY = np.linspace(-1, 1, BINS)
-POLE_ANGLE = np.linspace(-0.418, 0.418, BINS)
-POLE_ANGULAR_VELOCITY = np.linspace(-3, 3, BINS)
+# CART_POSITION = np.linspace(-4.8, 4.8, BINS)
+# CART_VELOCITY = np.linspace(-1, 1, BINS)
+# POLE_ANGLE = np.linspace(-0.418, 0.418, BINS)
+# POLE_ANGULAR_VELOCITY = np.linspace(-3, 3, BINS)
 
-
-def to_bins(value: np.ndarray, bins: np.ndarray) -> float:
-    """ Put a single float value into closest bin """
-    return np.digitize(x=[value], bins=bins)[0]
-
-
-def to_discrete_state(obs: Tuple[float, float, float, float]) -> Tuple[float, float, float, float]:
-    """ Transform an observation from continuous to discrete space"""
-    x, v, theta, omega = obs
-    state = (to_bins(x, CART_POSITION),
-             to_bins(v, CART_VELOCITY),
-             to_bins(theta, POLE_ANGLE),
-             to_bins(omega, POLE_ANGULAR_VELOCITY))
-    return state
 
 
 def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, exploration_rate: float) -> int:
@@ -51,7 +37,7 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     for episode in range(num_episodes):
         rewards.append(0)
         obs = env.reset()
-        # state = to_discrete_state(obs)
+
         state = tuple(obs)
 
         for t in range(MAX_EPISODE_LENGTH):
@@ -60,7 +46,7 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
 
             obs, reward, done, _ = env.step(action)
 
-            # next_state = to_discrete_state(obs)
+
             next_state = tuple(obs)
             optimal_next_action = policy(env, Q, next_state,
                                          exploration_rate)  # need to set no exporation to get optimal action
@@ -90,7 +76,7 @@ if __name__ == "__main__":
 
     # simulate agent after training
     obs = env.reset()
-    # state = to_discrete_state(obs)
+
     state = tuple(obs)
     current_total_reward=0
     for _ in range(1000):
@@ -101,7 +87,7 @@ if __name__ == "__main__":
         if done:
             print(f"with action from q_learning get reward {current_total_reward}")
             break
-        # state = to_discrete_state(obs)
+
         state = tuple(obs)
         time.sleep(0.5)
 
