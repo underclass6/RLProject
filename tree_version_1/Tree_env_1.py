@@ -95,7 +95,7 @@ class TreeEnv(gym.Env):
         meta_info={"year":self.year}
         return self.state, reward, done, meta_info
 
-    def render(self,current_total_reward):
+    def render(self,current_total_reward=0):
         pygame.init()
         pygame.display.set_caption("Tree_cpation(template)")
         screen = pygame.display.set_mode((600, 700))
