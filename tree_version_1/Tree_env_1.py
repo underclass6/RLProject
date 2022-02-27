@@ -95,7 +95,7 @@ class TreeEnv(gym.Env):
         meta_info={"year":self.year}
         return self.state, reward, done, meta_info
 
-    def render(self):
+    def render(self,current_total_reward):
         pygame.init()
         pygame.display.set_caption("Tree_cpation(template)")
         screen = pygame.display.set_mode((600, 700))
@@ -111,16 +111,16 @@ class TreeEnv(gym.Env):
                 background.blit(g.image, g.rect)
         screen.blit(background, (0, 0))
         # create font of hint for the number of timber
-        timber_value = 0.0  # value of single timber
-        timber_profit = 0.0  # total profit
+        #timber_value = 0.0  # value of single timber
+        #timber_profit = 0.0  # total profit
         timber_num_font = pygame.font.SysFont('arial', 50)
-        tn_surface = timber_num_font.render(r'Timber: ' + str(timber_profit), False, (130, 182, 217))
+        tn_surface = timber_num_font.render(r'Timber: ' + str(current_total_reward), False, (130, 182, 217))
         screen.blit(tn_surface, (50, 620))
 
         # the number of year and its font
         year_num = 0
         year_num_font = pygame.font.SysFont('arial', 50)
-        year_num_font_surface = year_num_font.render(r'Year: ' + str(year_num), False, (130, 182, 217))
+        year_num_font_surface = year_num_font.render(r'Year: ' + str(self.year), False, (130, 182, 217))
         screen.blit(year_num_font_surface, (400, 620))
 
         # create timber
