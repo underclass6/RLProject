@@ -10,7 +10,7 @@ for i in range(average_count):
     env.reset()
     total_reward=0
     for _ in range(10000):
-        env.render()
+        env.render(total_reward)
         current_state, get_reward, done, meta_info= env.step(env.action_space.sample()) # take a random action
 
         total_reward+=get_reward
