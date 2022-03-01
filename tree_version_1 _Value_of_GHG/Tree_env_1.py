@@ -32,6 +32,7 @@ class TreeEnv(gym.Env):
         self.viewer = None
         self.year=0
         self.total_co2reward=0
+        self.total_reward = 0
 
     def reset(self):
         np.random.seed(10)
@@ -52,9 +53,10 @@ class TreeEnv(gym.Env):
                 if(self.state[i]==action):
                     self.state[i]=-1
                     reward += value_of_tree[action]
+            self.total_reward += reward
             for i in range(100):
                 self.total_co2reward += value_of_greenhouse_gas_uptake[str(self.state[i])]
-                print(self.total_co2reward)
+                # print(self.total_co2reward)
 
 
         # elif action == 2:
@@ -109,13 +111,14 @@ class TreeEnv(gym.Env):
 
         if np.all(self.state[:] == -1) or self.year>10:
             done = True
-            if(self.total_co2reward<=10000):
-                reward = -reward
+            if(self.total_co2reward<=15000):
+                reward = -self.total_reward + reward
+            self.total_reward = 0
 
 
         meta_info={"year":self.year}
 
-        return self.state, reward, done, meta_info
+        return self.state, reward, done, meta_info, self.total_co2reward
 
     def render(self,current_total_reward=0):
         pygame.init()

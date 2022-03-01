@@ -33,9 +33,11 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     Q = defaultdict(lambda: np.random.uniform(1, -1))
 
     rewards = []
+    GHGs = []
     print(f"Performing Q-learning with {NUM_STATES:d} states")
     for episode in range(num_episodes):
         rewards.append(0)
+        GHGs.append(0)
         obs = env.reset()
 
         state = tuple(obs)
@@ -44,8 +46,7 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
             action = policy(env, Q, state, exploration_rate)
             # env.render()
 
-            obs, reward, done, _ = env.step(action)
-
+            obs, reward, done, _, GHG = env.step(action)
 
             next_state = tuple(obs)
             optimal_next_action = policy(env, Q, next_state,
@@ -58,12 +59,14 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
             state = next_state
 
             rewards[-1] += reward
+            GHGs[-1] = GHG
             if done:
                 break
 
         exploration_rate = max(exploration_rate_decay * exploration_rate, min_exploration_rate)
         if episode % (num_episodes / 100) == 0:
             print(f"Mean Reward: {np.mean(rewards[-int(num_episodes / 100):])}")
+            print(f"Mean GHG:  {np.mean(GHGs[-int(num_episodes / 100):])}")
 
     return rewards, Q
 
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     for _ in range(1000):
         env.render(current_total_reward)
         action = policy(env, Q, state, exploration_rate=0.0)
-        obs, get_reward, done, _ = env.step(action)
+        obs, get_reward, done, _, _ = env.step(action)
         current_total_reward+=get_reward
         if done:
             print(f"with action from q_learning get reward {current_total_reward}")

@@ -28,7 +28,7 @@ def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, explorat
     return np.argmax(q_values).item()
 
 
-def q_learning(env, num_episodes: int, exploration_rate=0.5, exploration_rate_decay=0.9, min_exploration_rate=0.01) -> \
+def q_learning(env, num_episodes: int, exploration_rate=1.0, exploration_rate_decay=0.9999, min_exploration_rate=0.05) -> \
 Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     Q = defaultdict(lambda: np.random.uniform(1, -1))
 
@@ -89,6 +89,6 @@ if __name__ == "__main__":
             break
 
         state = tuple(obs)
-        time.sleep(0.5)
+        time.sleep(2)
 
     env.close()
