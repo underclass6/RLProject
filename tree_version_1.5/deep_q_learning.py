@@ -25,8 +25,9 @@ replay_buffer = deque(maxlen=queue_len)  # buffer for replaying
 class Q_Net(nn.Module):
     def __init__(self, env):
         super(Q_Net, self).__init__()
+        print(env.observation_space.shape)
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(env.observation_space, 100),
+            nn.Linear(np.prod(env.observation_space.shape), 100),
             # nn.Linear(env.observation_space.n, 100),
             nn.ReLU(),
             # nn.Linear(100, 100),

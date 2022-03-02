@@ -32,7 +32,7 @@ class TreeEnv(gym.Env):
         self.action_space = spaces.Discrete(8)  # in version_1, 1-7 means cut down the tree of the specified year
         # and to the next year,0 means do nothing direct to the next year
         # self.observation_space = spaces.Discrete(100)
-        self.observation_space = 100 * 2
+        self.observation_space = spaces.Box(-1, 7, (100, 2))
         self.reward_range = (0, 10000)
         self.state = None
         self.viewer = None
@@ -57,7 +57,9 @@ class TreeEnv(gym.Env):
             # cut the specific trees with age as same as action-number
             reward = 0
             if len(self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))]) != 0:
-                reward = sum(self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))][0, :])
+                reward = sum(
+                    [value_of_tree_fn(i) for i in self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))][:, 0]]
+                )
                 # cut down tree with age from specified age to specified age plus 1
                 # and the fertility recovered to 3
                 self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))] = (-1, max_fertility)
