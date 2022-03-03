@@ -18,12 +18,12 @@ for i in range(average_count):
             print("done")
             print(f"get reward {total_reward}")
             average_reward+=total_reward
-            if meta_info["year"]>10:
-                print(f"10 years passed ")
-                #print(current_state)
-            else:
-                print(f"no avaliable tree now, which meanings all place are -1 now ")
-                print(current_state)
+            # if meta_info["year"]>10:
+            #     print(f"10 years passed ")
+            #     #print(current_state)
+            # else:
+            #     print(f"no avaliable tree now, which meanings all place are -1 now ")
+            #     print(current_state)
             break
 
     env.close()
