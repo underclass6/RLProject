@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import time
 
 from Tree_env_1 import TreeEnv
 
@@ -154,6 +155,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
         exploration_rate = max(exploration_rate_decay * exploration_rate, min_exploration_rate)
         if episode % (num_episodes / 100) == 0:
             print("Mean Reward: ", np.mean(rewards[-int(num_episodes / 100):]))
+
     return Q, rewards
 
 
@@ -161,6 +163,12 @@ if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
-    q_learning(env, 10000)
-
+    time_start = time.time()
+    q,reward = q_learning(env, 100)
+    time_end = time.time()
+    print("time cost", time_end-time_start,'s')
+    q.eval()
+    with torch.no_grad():
+        _,pred = q(torch.tensor(obs))
+        print(pred)
     env.close()
