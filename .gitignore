@@ -3,4 +3,5 @@ __pycache__/
 04_animation_tutorials/
 Scripts/
 Lib/
+Include/
 venv/

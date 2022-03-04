@@ -2,6 +2,11 @@ import pygame
 
 
 class AnimeObject(pygame.sprite.Sprite):
+    """
+    Visualize operations through pygame
+
+    """
+
     def __init__(self, frames_paths, fps=5):
         super().__init__()
         self.frames = []
