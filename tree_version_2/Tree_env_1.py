@@ -6,27 +6,30 @@ import pygame
 import os
 from sprites import *
 import random
-
+import math
 
 weight_timber = 1.0
-weight_greenhouse_gas = 0.2
+weight_greenhouse_gas = 0.25
 
 max_fertility = 3
 """ the fertility of land will not more than 3"""
 
-minimum_req_ghg_10years = 10000
+minimum_req_ghg_10years = 0
 """ People will protest if the minimum is not reached(get a negative reward)"""
 
-minimum_req_timber_1year = 30
+minimum_req_timber_1year = 0
 """ If you don't meet the minimum you won't be able to pay the rent(get a negative reward)"""
 
 random_seed= 10
-"""seed for get a state by random"""
+"""seed for get a state by random, 
+initial is 10 can also assigned by reset function
+like reset(seed=10)
+"""
 
-value_of_tree_fn = lambda x: 0 if x == -1 else x ** 2  # calculate the value of tree wrt. age 1，4，8，
-value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else x ** 2.5  # calculate this ability wrt. age **2.5 太大
+value_of_tree_fn = lambda x: 0 if x == -1 else math.pi*((0.5*x) ** 2)  # calculate the value of tree wrt. age 1，4，9，16,25,36,49
+value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else (x * 10)  # calculate this ability wrt. age * 10,  10 20 30 40 50 60 70
 tree_growth_fn = lambda x: x / max_fertility  # calculate the ability of growth of tree wrt. fertility
-absorb_fertility_ability_fn = lambda x: 0.1 * x  # calculate the absorbency of tree wrt. age
+absorb_fertility_ability_fn = lambda x: 0.05 * x  # calculate the absorbency of tree wrt. age
 
 
 def reward_cauculator(timber, greenhouse_gas):
@@ -48,8 +51,8 @@ def print_info(action, reward, reward_timber, reward_co2reward, year, total_rewa
     """if needed, print some useful information for data analysis"""
     print(f"year {year}, take action: {round(action,3)}, sum of reward: {round(reward,3)}-> reward from tree: {round(reward_timber,3)}, reward from ghg: {round(reward_co2reward,3)}")
     print(f"totoal reward_timber: {round(total_reward_timber,3)}, total_ghg: {round(total_co2reward,3)}")
-    #print("get new state")
-    #print(state)
+    # print("get new state")
+    # print(state)
     print("======================================================================================")
 
 class TreeEnv(gym.Env):
@@ -96,7 +99,7 @@ class TreeEnv(gym.Env):
         # and to the next year,0 means do nothing direct to the next year
         # self.observation_space = spaces.Discrete(100)
         self.observation_space = spaces.Box(-1, 7, (100, 2))
-        self.reward_range = (0, 10000)
+        self.reward_range = (-1000, 10000)
         self.state = None
         self.viewer = None
         self.year = 0
@@ -106,11 +109,20 @@ class TreeEnv(gym.Env):
         self.reward_timber = 0
         self.reward_co2reward = 0
 
-    def reset(self):
-        np.random.seed(random_seed)
-        # self.state =np.random.randint(size=100, low=0, high=8)
+    def reset(self, seed=random_seed):
+
+        np.random.seed(seed)
         age = np.random.randint(size=100, low=-1, high=8)
-        fertility = np.random.random(100)
+        fertility = np.zeros(100)
+        for i in range(100):
+            temp = age[i]
+            if temp <=0:
+                fertility[i]=3
+            else:
+                fertility[i]=3
+                for j in range(temp):
+                    fertility[i]=fertility[i]-age[i]*0.05
+
         self.state = np.column_stack((age, fertility))
         self.year = 0
         self.total_co2reward = 0
@@ -151,7 +163,7 @@ class TreeEnv(gym.Env):
             self.total_reward_timber += self.reward_timber
             self.total_co2reward += self.reward_co2reward
 
-        print_info(action,reward,self.reward_timber,self.reward_co2reward,self.year,self.total_reward_timber,self.total_co2reward,self.state)
+
 
         done = False
         self.year += 1
@@ -186,10 +198,10 @@ class TreeEnv(gym.Env):
                 self.state[i, 0] += tree_growth_fn(self.state[i, 1])
 
         # If there is no more trees or passed 10 years stop, and if total green house gas uptake less than setting, return a negative reward.
-        if np.all(self.state[:, 0] == -1) or self.year > 10:
+        if np.all(self.state[:, 0] == -1) or self.year > 15:
             done = True
             if (self.total_co2reward <= minimum_req_ghg_10years ):#10000
-                reward = -self.total_reward + reward
+                reward = -2000
             # if (self.total_co2reward <= 10000 or self.total_reward_timber<=100):
             #     reward = -self.total_reward + reward
             self.total_reward = 0
@@ -199,6 +211,9 @@ class TreeEnv(gym.Env):
         # If reward from timber less than 30 this year, retrun a negative reward
         if self.reward_timber <= minimum_req_timber_1year:
             reward = -200
+
+        print_info(action, reward, self.reward_timber, self.reward_co2reward, self.year, self.total_reward_timber,
+                   self.total_co2reward, self.state)
         return self.state, reward, done, meta_info   # , self.total_co2reward
 
     def render(self, current_total_reward=0):
@@ -270,7 +285,7 @@ class TreeEnv(gym.Env):
                     os.getcwd() + r'/assets/trees-blackland/tree4/tree4_03.png'
                 ], random.randint(2, 10)))
 
-        print(self.state)
+
         for i in range(10):
             for j in range(10):
                 tree = trees[i][j]
