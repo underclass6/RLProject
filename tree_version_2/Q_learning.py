@@ -1,5 +1,5 @@
 from typing import Tuple, Any, DefaultDict, List
-import dill as pickle
+# import dill as pickle
 
 import gym
 import numpy as np
@@ -91,7 +91,11 @@ if __name__ == "__main__":
     # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
-    rewards, Q = q_learning(env, 10000)
+    time_start = time.time()
+    rewards, Q = q_learning(env, 100000)
+    time_end = time.time()
+    print("time cost", time_end-time_start,'s')
+
 
     # save model
     # with open('Q_learning_model.pkl', 'wb') as pkl_handle:
