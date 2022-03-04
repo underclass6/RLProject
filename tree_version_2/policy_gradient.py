@@ -7,7 +7,7 @@ import torch.optim as optim
 from matplotlib import pyplot as plt
 from torch.distributions import Categorical
 from Tree_env_1 import TreeEnv
-
+import time
 MAX_EPISODE_LENGTH = 1000
 DISCOUNT_FACTOR = 1.0
 SEED = 0
@@ -136,7 +136,11 @@ def evaluation(env, fix_seed=True, seed=0):
 
 
 if __name__ == "__main__":
+    time_start = time.time()
     rewards = policy_gradient(10000)
+    time_end = time.time()
+    print("time cost", time_end-time_start,'s')
+
 
     _, ax = plt.subplots()
     ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)

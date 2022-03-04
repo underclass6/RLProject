@@ -18,7 +18,7 @@ def random_field(counts=10):
         env.reset()
         total_reward=0
         for _ in range(10000):
-            env.render(total_reward)
+            env.render()
             current_state, get_reward, done, meta_info= env.step(env.action_space.sample()) # take a random action
 
             total_reward+=get_reward
