@@ -7,36 +7,40 @@ import os
 from sprites import *
 import random
 
-
-
-value_of_tree=[0,1,3,6,10,15,23,30]
+value_of_tree = [0, 1, 4, 9, 16, 25, 36, 49]
 value_of_greenhouse_gas_uptake = {
-'-1': 0,
-'0': 0,
-'1': 5,
-'2': 10,
-'3': 15,
-'4': 20,
-'5': 25,
-'6': 30,
-'7': 35,
+    '-1': 0,
+    '0': 0,
+    '1': 5,
+    '2': 10,
+    '3': 15,
+    '4': 20,
+    '5': 25,
+    '6': 30,
+    '7': 35,
 }
+
+
 class TreeEnv(gym.Env):
-    #the value of tree from age 1 to age 7
+    # the value of tree from age 1 to age 7
     def __init__(self):
-        self.action_space = spaces.Discrete(8) # in version_1, 1-7 means cut down the tree of the specified year
+        self.action_space = spaces.Discrete(8)  # in version_1, 1-7 means cut down the tree of the specified year
         # and to the next year,0 means do nothing direct to the next year
-        self.observation_space =spaces.Discrete(100)
-        self.reward_range = (0,10000)
+        self.observation_space = spaces.Discrete(100)
+        self.reward_range = (0, 10000)
         self.state = None
         self.viewer = None
-        self.year=0
-        self.total_co2reward=0
+        self.year = 0
+        self.total_co2reward = 0
         self.total_reward = 0
+        np.random.seed(2)
+        self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self):
-        np.random.seed(10)
-        self.state =np.random.randint(size=100, low=0, high=8)
+    def reset(self, fix=True):
+        if fix:
+            self.state = self._age_fixed.copy()
+        else:
+            self.state = np.random.randint(size=100, low=-1, high=8)
         self.year = 0
         self.total_co2reward = 0
         return self.state
@@ -44,20 +48,19 @@ class TreeEnv(gym.Env):
     def step(self, action):
         if action == 0:
 
-            reward=0
+            reward = 0
 
-        elif action >= 1 and action<=7:
-        #cut the specific trees with age as same as action-number
-            reward=0
+        elif action >= 1 and action <= 7:
+            # cut the specific trees with age as same as action-number
+            reward = 0
             for i in range(100):
-                if(self.state[i]==action):
-                    self.state[i]=-1
+                if (self.state[i] == action):
+                    self.state[i] = -1
                     reward += value_of_tree[action]
             self.total_reward += reward
             for i in range(100):
                 self.total_co2reward += value_of_greenhouse_gas_uptake[str(self.state[i])]
                 # print(self.total_co2reward)
-
 
         # elif action == 2:
         #     reward=0
@@ -83,50 +86,48 @@ class TreeEnv(gym.Env):
         done = False
 
         self.year += 1
-        #tree growing, state around 7-years-old tree will be planted
+        # tree growing, state around 7-years-old tree will be planted
         for i in range(100):
-            if (self.state[i] != -1) and(self.state[i] != 7):
+            if (self.state[i] != -1) and (self.state[i] != 7):
                 self.state[i] += 1
 
-            if (self.state[i]==7):
-                if i-11>0:
-                    if self.state[i-11]==-1:
-                        self.state[i-11]=0
-                    if self.state[i-10]==-1:
-                        self.state[i-10]=0
-                    if self.state[i-9]==-1:
-                        self.state[i-9]=0
-                if i%10!=0 and self.state[i-1]==-1:
-                    self.state[i-1] = 0
-                if i%10!=9 and self.state[i+1]==-1:
-                    self.state[i+1] = 0
-                if i+11 < 100:
-                    if self.state[i+11]==-1:
-                        self.state[i+11]=0
-                    if self.state[i+10]==-1:
-                        self.state[i+10]=0
-                    if self.state[i+9]==-1:
-                        self.state[i+9]=0
+            if (self.state[i] == 7):
+                if i - 11 > 0:
+                    if self.state[i - 11] == -1:
+                        self.state[i - 11] = 0
+                    if self.state[i - 10] == -1:
+                        self.state[i - 10] = 0
+                    if self.state[i - 9] == -1:
+                        self.state[i - 9] = 0
+                if i % 10 != 0 and self.state[i - 1] == -1:
+                    self.state[i - 1] = 0
+                if i % 10 != 9 and self.state[i + 1] == -1:
+                    self.state[i + 1] = 0
+                if i + 11 < 100:
+                    if self.state[i + 11] == -1:
+                        self.state[i + 11] = 0
+                    if self.state[i + 10] == -1:
+                        self.state[i + 10] = 0
+                    if self.state[i + 9] == -1:
+                        self.state[i + 9] = 0
 
-
-        if np.all(self.state[:] == -1) or self.year>10:
+        if np.all(self.state[:] == -1) or self.year > 10:
             done = True
-            if(self.total_co2reward<=15000):
+            if (self.total_co2reward <= 15000):
                 reward = -self.total_reward + reward
             self.total_reward = 0
 
-
-        meta_info={"year":self.year}
+        meta_info = {"year": self.year}
 
         return self.state, reward, done, meta_info, self.total_co2reward
 
-    def render(self,current_total_reward=0):
+    def render(self, current_total_reward=0):
         pygame.init()
         pygame.display.set_caption("Tree_cpation(template)")
         screen = pygame.display.set_mode((600, 700))
         screen.fill((0, 0, 0))
         clock = pygame.time.Clock()
-        ground_paths = [os.getcwd() + r'/assets/PixelTrees/ground' + str(i+1) + '.png' for i in range(4)]
+        ground_paths = [os.getcwd() + r'/assets/PixelTrees/ground' + str(i + 1) + '.png' for i in range(4)]
         background = pygame.surface.Surface((600, 600))
         for i in range(10):
             for j in range(10):
@@ -136,8 +137,8 @@ class TreeEnv(gym.Env):
                 background.blit(g.image, g.rect)
         screen.blit(background, (0, 0))
         # create font of hint for the number of timber
-        #timber_value = 0.0  # value of single timber
-        #timber_profit = 0.0  # total profit
+        # timber_value = 0.0  # value of single timber
+        # timber_profit = 0.0  # total profit
         timber_num_font = pygame.font.SysFont('arial', 25)
         tn_surface = timber_num_font.render(r'Timber: ' + str(current_total_reward), False, (130, 182, 217))
         screen.blit(tn_surface, (25, 620))
@@ -149,9 +150,9 @@ class TreeEnv(gym.Env):
         screen.blit(year_num_font_surface, (500, 620))
 
         self.total_co2reward_font = pygame.font.SysFont('arial', 25)
-        self.total_co2reward_font_surface = self.total_co2reward_font.render(r'Value of GHG: ' + str(self.total_co2reward), False, (130,182,217))
-        screen.blit(self.total_co2reward_font_surface, (200,620))
-
+        self.total_co2reward_font_surface = self.total_co2reward_font.render(
+            r'Value of GHG: ' + str(self.total_co2reward), False, (130, 182, 217))
+        screen.blit(self.total_co2reward_font_surface, (200, 620))
 
         # create timber
         got_timber, got_timbers = False, False
@@ -177,7 +178,6 @@ class TreeEnv(gym.Env):
             pygame.image.load(os.getcwd() + r'/assets/trees-blackland/tree4/tree4_03.png').convert_alpha()
         ]
 
-
         trees = []
 
         for _ in range(10):
@@ -194,7 +194,7 @@ class TreeEnv(gym.Env):
         for i in range(10):
             for j in range(10):
                 tree = trees[i][j]
-                tree.age = self.state[i*10+j]  # random generation
+                tree.age = self.state[i * 10 + j]  # random generation
 
                 if tree.age == -1.0:
                     tree.is_chopped = True
@@ -224,6 +224,7 @@ class TreeEnv(gym.Env):
         select_cursor.draw(screen)
 
         pygame.display.flip()
+
     def close(self):
         if self.viewer:
             self.viewer.close()

@@ -43,11 +43,16 @@ class TreeEnv(gym.Env):
         self.total_co2reward = 0
         self.total_reward = 0
         self.total_reward_timber = 0
+        np.random.seed(0)
+        self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self):
-        np.random.seed(10)
+    def reset(self, fix=True):
+        # np.random.seed(0)
         # self.state =np.random.randint(size=100, low=0, high=8)
-        age = np.random.randint(size=100, low=-1, high=8)
+        if fix:
+            age = self._age_fixed
+        else:
+            age = np.random.randint(size=100, low=-1, high=8)
         fertility = np.random.random(100)
         self.state = np.column_stack((age, fertility))
         self.year = 0
@@ -102,10 +107,10 @@ class TreeEnv(gym.Env):
         #             self.state[i]=0
         #             reward += value_of_tree[action]
 
-        print(f"action {action} sum of reward {reward} reward from tree {reward_timber} reward from ghg {reward_co2reward}")
-        print(
-            f"year {self.year} totoal reward_timber for now  {self.total_reward_timber} total ghg for now{self.total_co2reward}")
-        print("======================================================================================")
+        # print(f"action {action} sum of reward {reward} reward from tree {reward_timber} reward from ghg {reward_co2reward}")
+        # print(
+        #     f"year {self.year} totoal reward_timber for now  {self.total_reward_timber} total ghg for now{self.total_co2reward}")
+        # print("======================================================================================")
         done = False
 
         self.year += 1

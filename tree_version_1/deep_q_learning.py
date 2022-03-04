@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from matplotlib import pyplot as plt
 
 from Tree_env_1 import TreeEnv
 
@@ -152,10 +153,53 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
     return Q, rewards
 
 
+def evaluation(env, Q):
+    obs = env.reset()
+
+    state = obs
+    current_total_reward = 0
+    for _ in range(1000):
+        # env.render(current_total_reward)
+        action = policy(Q, env, state, exploration_rate=0.0)
+        obs, get_reward, done, _ = env.step(action)
+        next_state = obs
+        state = next_state
+        current_total_reward += get_reward
+        if done:
+            print(f"with action from q_learning get reward {current_total_reward}")
+            break
+        print(f'state: {state}, action: {action}')
+
+        # time.sleep(2)
+
+
 if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
-    q_learning(env, 10000)
+    Q, rewards = q_learning(env, 10000)
+
+    # save model
+    torch.save(Q.state_dict(), 'deep_q_learning_model')
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 1 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
+
+    # read model
+    Q = Q_Net(env)
+    Q.load_state_dict(torch.load('deep_q_learning_model'))
+
+    # evaluation
+    evaluation(env, Q)
 
     env.close()

@@ -68,10 +68,14 @@ class TreeEnv(gym.Env):
         self.total_co2reward = 0
         self.total_reward = 0
         self.total_reward_s = 0
+        np.random.seed(0)
+        self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self):
-        np.random.seed(10)
-        self.state = np.random.randint(size=100, low=-1, high=8)
+    def reset(self, fix=True):
+        if fix:
+            self.state = self._age_fixed.copy()
+        else:
+            self.state = np.random.randint(size=100, low=-1, high=8)
         self.year = 0
         self.total_co2reward = 0
         self.total_reward = 0
@@ -86,7 +90,7 @@ class TreeEnv(gym.Env):
             for i in range(100):
                 reward_co2reward += value_of_greenhouse_gas_uptake[str(self.state[i])]
             reward = reward_s + reward_co2reward
-            print(f"action {action} sum of reward {reward} reward from tree {reward_s} reward from ghg {reward_co2reward}")
+            # print(f"action {action} sum of reward {reward} reward from tree {reward_s} reward from ghg {reward_co2reward}")
 
         elif action >= 1 and action <= 7:
             # cut the specific trees with age as same as action-number
@@ -107,10 +111,10 @@ class TreeEnv(gym.Env):
             self.total_reward_s += reward_s
             reward = reward_co2reward + reward_s
             self.total_reward += reward
-            print(f"action {action} sum of reward {reward} reward from tree {reward_s} reward from ghg {reward_co2reward}")
-            print(
-                f"year {self.year} totoal reward_s for now  {self.total_reward_s} total ghg for now{self.total_co2reward}")
-            print("======================================================================================")
+            # print(f"action {action} sum of reward {reward} reward from tree {reward_s} reward from ghg {reward_co2reward}")
+            # print(
+            #     f"year {self.year} totoal reward_s for now  {self.total_reward_s} total ghg for now{self.total_co2reward}")
+            # print("======================================================================================")
         # elif action == 2:
         #     reward=0
         #     for i in range(100):

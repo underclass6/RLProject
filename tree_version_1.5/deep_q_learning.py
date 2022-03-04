@@ -8,12 +8,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from matplotlib import pyplot as plt
 
 from Tree_env_1 import TreeEnv
 
 MAX_EPISODE_LENGTH = 1000
 DISCOUNT_FACTOR = 1.0
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 
 """Implement DQN"""
 
@@ -27,12 +28,12 @@ class Q_Net(nn.Module):
         super(Q_Net, self).__init__()
         print(env.observation_space.shape)
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(np.prod(env.observation_space.shape), 100),
+            nn.Linear(np.prod(env.observation_space.shape), 150),
             # nn.Linear(env.observation_space.n, 100),
-            nn.ReLU(),
-            # nn.Linear(100, 100),
             # nn.ReLU(),
-            nn.Linear(100, env.action_space.n)
+            # nn.Linear(150, 150),
+            # nn.ReLU(),
+            nn.Linear(150, env.action_space.n)
         )
     def forward(self, x):
         output = self.linear_relu_stack(x)
@@ -102,17 +103,19 @@ def vfa_update(Q, optimizer, states, actions, rewards, dones, next_states):
     return loss.item()
 
 
-def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0.999, min_exploration_rate=0.05, Q=None):
+def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0.9999, min_exploration_rate=0.05, Q=None):
     # TODO: Update q-learning and add a replay-buffer
     if Q is None:
         Q = make_Q(env)
 
-    optimizer = optim.Adam(Q.parameters(), lr=5e-4)
+    optimizer = optim.Adam(Q.parameters(), lr=1e-5)
     rewards = []
     vfa_update_data = []
+    GHGs = []
     for episode in range(num_episodes):
         rewards.append(0)
-        obs = env.reset()
+        GHGs.append(0)
+        obs = env.reset(0)
         state = obs
         state_flatten = state.flatten('F')
 
@@ -121,7 +124,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
 #                 env.render()
             action = policy(Q, env, state_flatten, exploration_rate)
 
-            obs, reward, done, _, _ = env.step(action)
+            obs, reward, done, _, GHG = env.step(action)
 
             next_state = obs
             next_state_flatten = next_state.flatten('F')
@@ -148,19 +151,41 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
                 
                 vfa_update_data = []
 
+
+            GHGs[-1] = GHG
             if done:
                 break
 
         exploration_rate = max(exploration_rate_decay * exploration_rate, min_exploration_rate)
         if episode % (num_episodes / 100) == 0:
             print("Mean Reward: ", np.mean(rewards[-int(num_episodes / 100):]))
+            # print(f"Mean GHG:  {np.mean(GHGs[-int(num_episodes / 100):])}")
     return Q, rewards
 
 
 if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
-    obs = env.reset()
-    q_learning(env, 10000)
+    obs = env.reset(0)
+    Q, rewards = q_learning(env, 10000)
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
+    # ax.step([i for i in range(1, len(rewards) + 1)], GHGs, linewidth=0.5)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.legend(['reward', 'CO2 absorbency'])
+    plt.title('Version 4 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
+    # print(f'Mean CO2 absorbency: {np.mean(GHGs)}')
+    # print(f'Standard deviation: {np.std(GHGs)}')
+    # print(f'Max CO2 absorbency: {np.max(GHGs)}')
+    # print(f'Min CO2 absorbency: {np.min(GHGs)}')
 
     env.close()

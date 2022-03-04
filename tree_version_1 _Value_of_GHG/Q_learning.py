@@ -5,6 +5,8 @@ import numpy as np
 from collections import defaultdict
 import time
 
+from matplotlib import pyplot as plt
+
 from Tree_env_1 import TreeEnv
 
 MAX_EPISODE_LENGTH = 250
@@ -28,7 +30,7 @@ def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, explorat
     return np.argmax(q_values).item()
 
 
-def q_learning(env, num_episodes: int, exploration_rate=0.5, exploration_rate_decay=0.9, min_exploration_rate=0.01) -> \
+def q_learning(env, num_episodes: int, exploration_rate=1.0, exploration_rate_decay=0.9999, min_exploration_rate=0.05) -> \
 Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     Q = defaultdict(lambda: np.random.uniform(1, -1))
 
@@ -68,14 +70,33 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
             print(f"Mean Reward: {np.mean(rewards[-int(num_episodes / 100):])}")
             print(f"Mean GHG:  {np.mean(GHGs[-int(num_episodes / 100):])}")
 
-    return rewards, Q
+    return rewards, Q, GHGs
 
 
 if __name__ == "__main__":
     # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
-    _, Q = q_learning(env, 1000)
+    rewards, Q, GHGs = q_learning(env, 10000)
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
+    ax.step([i for i in range(1, len(rewards) + 1)], GHGs, linewidth=0.5)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward & CO2 absorbency')
+    plt.legend(['reward', 'CO2 absorbency'])
+    plt.title('Version 2 & Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
+    print(f'Mean CO2 absorbency: {np.mean(GHGs)}')
+    print(f'Standard deviation: {np.std(GHGs)}')
+    print(f'Max CO2 absorbency: {np.max(GHGs)}')
+    print(f'Min CO2 absorbency: {np.min(GHGs)}')
 
     # simulate agent after training
     obs = env.reset()
@@ -83,7 +104,7 @@ if __name__ == "__main__":
     state = tuple(obs)
     current_total_reward=0
     for _ in range(1000):
-        env.render(current_total_reward)
+        # env.render(current_total_reward)
         action = policy(env, Q, state, exploration_rate=0.0)
         obs, get_reward, done, _, _ = env.step(action)
         current_total_reward+=get_reward

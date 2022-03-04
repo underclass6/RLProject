@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from matplotlib import pyplot as plt
 
 from Tree_env_1 import TreeEnv
 
@@ -102,7 +103,7 @@ def vfa_update(Q, optimizer, states, actions, rewards, dones, next_states):
     return loss.item()
 
 
-def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0.999, min_exploration_rate=0.05, Q=None):
+def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0.9999, min_exploration_rate=0.05, Q=None):
     # TODO: Update q-learning and add a replay-buffer
     if Q is None:
         Q = make_Q(env)
@@ -161,6 +162,19 @@ if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
-    q_learning(env, 10000)
+    Q, rewards = q_learning(env, 10000)
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 5 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
 
     env.close()

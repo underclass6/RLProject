@@ -1,9 +1,11 @@
+import dill as pickle
 from typing import Tuple, Any, DefaultDict, List
 
 import gym
 import numpy as np
 from collections import defaultdict
 import time
+import matplotlib.pyplot as plt
 
 from Tree_env_1 import TreeEnv
 
@@ -68,27 +70,53 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     return rewards, Q
 
 
+def evaluation(env, Q):
+    obs = env.reset()
+
+    state = tuple(obs)
+    current_total_reward = 0
+    for _ in range(1000):
+        # env.render(current_total_reward)
+        action = policy(env, Q, state, exploration_rate=0.0)
+        obs, get_reward, done, _ = env.step(action)
+        current_total_reward += get_reward
+        if done:
+            print(f"with action from q_learning get reward {current_total_reward}")
+            break
+        print(f'state: {state}, action: {action}')
+
+        state = tuple(obs)
+        # time.sleep(2)
+
+
 if __name__ == "__main__":
     # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
-    _, Q = q_learning(env, 1000)
+    rewards, Q = q_learning(env, 10000)
 
-    # simulate agent after training
-    obs = env.reset()
+    # save model
+    with open('Q_learning_model.pkl', 'wb') as pkl_handle:
+        pickle.dump(Q, pkl_handle)
 
-    state = tuple(obs)
-    current_total_reward=0
-    for _ in range(1000):
-        env.render(current_total_reward)
-        action = policy(env, Q, state, exploration_rate=0.0)
-        obs, get_reward, done, _ = env.step(action)
-        current_total_reward+=get_reward
-        if done:
-            print(f"with action from q_learning get reward {current_total_reward}")
-            break
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 1 & Q-Learning')
+    plt.show()
 
-        state = tuple(obs)
-        time.sleep(2)
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
+
+    # read model from file
+    with open('Q_learning_model.pkl', 'rb') as pkl_handle:
+        Q = pickle.load(pkl_handle)
+
+    # evaluation
+    evaluation(env, Q)
 
     env.close()

@@ -8,12 +8,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from matplotlib import pyplot as plt
 
 from Tree_env_1 import TreeEnv
 
 MAX_EPISODE_LENGTH = 1000
 DISCOUNT_FACTOR = 1.0
-BATCH_SIZE = 64
+BATCH_SIZE = 256
 
 """Implement DQN"""
 
@@ -27,11 +28,11 @@ class Q_Net(nn.Module):
         super(Q_Net, self).__init__()
         self.linear_relu_stack = nn.Sequential(
             # nn.Linear(np.prod(env.observation_space.shape), 100),
-            nn.Linear(env.observation_space.n, 100),
+            nn.Linear(env.observation_space.n, 256),
             nn.ReLU(),
             # nn.Linear(100, 100),
             # nn.ReLU(),
-            nn.Linear(100, env.action_space.n)
+            nn.Linear(256, env.action_space.n)
         )
     def forward(self, x):
         output = self.linear_relu_stack(x)
@@ -50,7 +51,7 @@ def make_Q(env) -> nn.Module:
     # Q.weight.data.uniform_(-0.0001, 0.0001)
     
     Q = Q_Net(env)
-    Q.linear_relu_stack[0].weight.data.uniform_(-0.0001, 0.0001)
+    Q.linear_relu_stack[0].weight.data.uniform_(-0.001, 0.001)
     
     # use GPU
     # Q.to(device)
@@ -105,7 +106,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
     if Q is None:
         Q = make_Q(env)
 
-    optimizer = optim.Adam(Q.parameters(), lr=5e-4)
+    optimizer = optim.Adam(Q.parameters(), lr=1e-4)
     rewards = []
     vfa_update_data = []
     for episode in range(num_episodes):
@@ -145,8 +146,8 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
             if done:
                 break
 
-            if episode % 100 == 0:
-                env.render(reward)
+            # if episode % 100 == 0:
+                # env.render(reward)
         exploration_rate = max(exploration_rate_decay * exploration_rate, min_exploration_rate)
         if episode % (num_episodes / 100) == 0:
             print("Mean Reward: ", np.mean(rewards[-int(num_episodes / 100):]))
@@ -157,6 +158,19 @@ if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
-    q_learning(env, 10000)
+    Q, rewards = q_learning(env, 10000)
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 3 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
 
     env.close()

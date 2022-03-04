@@ -39,11 +39,16 @@ class TreeEnv(gym.Env):
         self.year = 0
         self.total_co2reward = 0
         self.total_reward = 0
+        np.random.seed(1)
+        self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self):
-        np.random.seed(10)
+    def reset(self, fix=True):
+        if fix:
+            age = self._age_fixed.copy()
+        else:
+            age = np.random.randint(size=100, low=-1, high=8)
         # self.state =np.random.randint(size=100, low=0, high=8)
-        age = np.random.randint(size=100, low=0, high=8)
+        # age = np.random.randint(size=100, low=0, high=8)
         fertility = np.random.random(100)
         self.state = np.column_stack((age, fertility))
         self.year = 0
@@ -124,8 +129,8 @@ class TreeEnv(gym.Env):
 
         if np.all(self.state[:, 0] == -1) or self.year > 10:
             done = True
-            if (self.total_co2reward <= 30000):
-                reward = -self.total_reward + reward
+            # if (self.total_co2reward <= 20000):
+            #     reward = -self.total_reward + reward
             self.total_reward = 0
 
         meta_info = {"year": self.year}
