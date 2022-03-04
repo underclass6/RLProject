@@ -8,27 +8,32 @@ from sprites import *
 import random
 import math
 
-weight_timber = 1.0
-weight_greenhouse_gas = 0.25
+WEIGHT_TIMBER = 1.0
+WEIGHT_GREENHOUSE_GAS = 0.05
+""" two weights effect result of the reward """
 
-max_fertility = 3
+MAX_FERTILITY = 3
 """ the fertility of land will not more than 3"""
 
-minimum_req_ghg_10years = 0
-""" People will protest if the minimum is not reached(get a negative reward)"""
+MINIMUM_REQ_GHG_10 = 200
+""" 
+minimum requirement for Greenhouse gas in 10 year
+People will protest if the minimum is not reached(get a negative reward)"""
 
-minimum_req_timber_1year = 0
-""" If you don't meet the minimum you won't be able to pay the rent(get a negative reward)"""
+MINIMUM_REQ_TIMBER_1 = 25
+""" 
+minimum requirement for Timber in 1 year
+If you don't meet the minimum you won't be able to pay the rent(get a negative reward)"""
 
-random_seed= 10
+RANDOM_SEED = 10
 """seed for get a state by random, 
-initial is 10 can also assigned by reset function
+default is 10 can also assigned by reset function
 like reset(seed=10)
 """
 
 value_of_tree_fn = lambda x: 0 if x == -1 else math.pi*((0.5*x) ** 2)  # calculate the value of tree wrt. age 1，4，9，16,25,36,49
 value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else (x * 10)  # calculate this ability wrt. age * 10,  10 20 30 40 50 60 70
-tree_growth_fn = lambda x: x / max_fertility  # calculate the ability of growth of tree wrt. fertility
+tree_growth_fn = lambda x: x / MAX_FERTILITY  # calculate the ability of growth of tree wrt. fertility
 absorb_fertility_ability_fn = lambda x: 0.05 * x  # calculate the absorbency of tree wrt. age
 
 
@@ -45,7 +50,7 @@ def reward_cauculator(timber, greenhouse_gas):
 
     Can add more input, but also need set more parameters as correspond weight
     """
-    return timber * weight_timber + greenhouse_gas * weight_greenhouse_gas
+    return timber * WEIGHT_TIMBER + greenhouse_gas * WEIGHT_GREENHOUSE_GAS
 
 def print_info(action, reward, reward_timber, reward_co2reward, year, total_reward_timber, total_co2reward,state):
     """if needed, print some useful information for data analysis"""
@@ -87,14 +92,12 @@ class TreeEnv(gym.Env):
         the goal is to Provide the highest possible economic benefits(value of Timber) while ensuring environmental protection
         (for now means greenhouse gas uptake)
 
-        ### Version History
-        - v0
-        - v1
-        - v2
-        - v3
+
     """
 
     def __init__(self):
+        """initial some value"""
+
         self.action_space = spaces.Discrete(8)  # in version_1, 1-7 means cut down the tree of the specified year
         # and to the next year,0 means do nothing direct to the next year
         # self.observation_space = spaces.Discrete(100)
@@ -108,10 +111,11 @@ class TreeEnv(gym.Env):
         self.total_reward = 0
         self.reward_timber = 0
         self.reward_co2reward = 0
-        np.random.seed(0)
+        np.random.seed(RANDOM_SEED)
         self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
     def reset(self, fix=True):
+        """reset the env to the beginning"""
         if fix:
             age = self._age_fixed
         else:
@@ -135,6 +139,17 @@ class TreeEnv(gym.Env):
         return self.state
 
     def step(self, action):
+        """ A#ttribute:
+            action: 0-7 if action == 0, only calculate the co2reward,
+            or 1<action<7, set the tree that age from action to action+1 as -1,
+            calculate the rewardtimber and co2reward, sum them with some weight
+
+            if not done, tree will grow, and fertility of piece will be absorbed
+
+            #return :
+            new state.
+
+        """
         reward = 0
         self.reward_timber = 0
         self.reward_co2reward = 0
@@ -155,7 +170,7 @@ class TreeEnv(gym.Env):
                 )
                 # cut down tree with age from specified age to specified age plus 1
                 # and the fertility recovered to 3
-                self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))] = (-1, max_fertility)
+                self.state[((action <= self.state[:, 0]) & (self.state[:, 0] < action + 1))] = (-1, MAX_FERTILITY)
 
 
 
@@ -205,7 +220,7 @@ class TreeEnv(gym.Env):
         # If there is no more trees or passed 10 years stop, and if total green house gas uptake less than setting, return a negative reward.
         if np.all(self.state[:, 0] == -1) or self.year > 15:
             done = True
-            if (self.total_co2reward <= minimum_req_ghg_10years ):#10000
+            if (self.total_co2reward <= MINIMUM_REQ_GHG_10 ):#10000
                 reward = -2000
             # if (self.total_co2reward <= 10000 or self.total_reward_timber<=100):
             #     reward = -self.total_reward + reward
@@ -214,14 +229,15 @@ class TreeEnv(gym.Env):
         meta_info = {"year": self.year}
 
         # If reward from timber less than 30 this year, retrun a negative reward
-        if self.reward_timber <= minimum_req_timber_1year:
+        if self.reward_timber <= MINIMUM_REQ_TIMBER_1:
             reward = -200
 
         print_info(action, reward, self.reward_timber, self.reward_co2reward, self.year, self.total_reward_timber,
                    self.total_co2reward, self.state)
         return self.state, reward, done, meta_info   # , self.total_co2reward
 
-    def render(self, current_total_reward=0):
+    def render(self):
+        """display the UI"""
         pygame.init()
         pygame.display.set_caption("Tree_cpation(template)")
         screen = pygame.display.set_mode((600, 700))
@@ -236,9 +252,8 @@ class TreeEnv(gym.Env):
                 g.set_pos((i * 60, j * 60))
                 background.blit(g.image, g.rect)
         screen.blit(background, (0, 0))
+
         # create font of hint for the number of timber
-        # timber_value = 0.0  # value of single timber
-        # timber_profit = 0.0  # total profit
         timber_num_font = pygame.font.SysFont('arial', 25)
         tn_surface = timber_num_font.render(r'Timber: ' + str(round(self.reward_timber,3)), False, (130, 182, 217))
         screen.blit(tn_surface, (25, 620))
@@ -248,7 +263,7 @@ class TreeEnv(gym.Env):
         year_num_font = pygame.font.SysFont('arial', 25)
         year_num_font_surface = year_num_font.render(r'Year: ' + str(round(self.year,3)), False, (130, 182, 217))
         screen.blit(year_num_font_surface, (500, 620))
-
+        # the number of reward from greenhouse gas
         self.total_co2reward_font = pygame.font.SysFont('arial', 25)
         self.total_co2reward_font_surface = self.total_co2reward_font.render(
             r'Value of GHG: ' + str(round(self.total_co2reward,3)), False, (130, 182, 217))
