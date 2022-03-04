@@ -70,8 +70,8 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
     return rewards, Q
 
 
-def evaluation(env, Q):
-    obs = env.reset()
+def evaluation(env, Q, fix_seed=True, seed=0):
+    obs = env.reset(fix_seed, seed)
 
     state = tuple(obs)
     current_total_reward = 0
@@ -87,36 +87,60 @@ def evaluation(env, Q):
 
         state = tuple(obs)
         # time.sleep(2)
+    return current_total_reward
 
 
 if __name__ == "__main__":
     # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
-    rewards, Q = q_learning(env, 10000)
-
-    # save model
-    with open('Q_learning_model.pkl', 'wb') as pkl_handle:
-        pickle.dump(Q, pkl_handle)
-
-    _, ax = plt.subplots()
-    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
-    ax.grid()
-    ax.set_xlabel('episode')
-    ax.set_ylabel('reward')
-    plt.title('Version 1 & Q-Learning')
-    plt.show()
-
-    print(f'Mean reward: {np.mean(rewards)}')
-    print(f'Standard deviation: {np.std(rewards)}')
-    print(f'Max reward: {np.max(rewards)}')
-    print(f'Min reward: {np.min(rewards)}')
+    # rewards, Q = q_learning(env, 10000)
+    #
+    # # save model
+    # with open('Q_learning_model.pkl', 'wb') as pkl_handle:
+    #     pickle.dump(Q, pkl_handle)
+    #
+    # _, ax = plt.subplots()
+    # ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
+    # ax.grid()
+    # ax.set_xlabel('episode')
+    # ax.set_ylabel('reward')
+    # plt.title('Version 1 & Q-Learning')
+    # plt.show()
+    #
+    # print(f'Mean reward: {np.mean(rewards)}')
+    # print(f'Standard deviation: {np.std(rewards)}')
+    # print(f'Max reward: {np.max(rewards)}')
+    # print(f'Min reward: {np.min(rewards)}')
 
     # read model from file
     with open('Q_learning_model.pkl', 'rb') as pkl_handle:
         Q = pickle.load(pkl_handle)
 
     # evaluation
-    evaluation(env, Q)
+    eval_rewards = []
+    for seed in range(0, 50):
+        r = evaluation(env, Q, False, seed)
+        eval_rewards.append(r)
+
+    # random simulation
+    sim_rewards = []
+    for seed in range(0, 50):
+        obs = env.reset(False, seed)
+        current_total_reward = 0
+        for _ in range(1000):
+            obs, reward, done, _ = env.step(np.random.randint(0, 8))
+            current_total_reward += reward
+            if done:
+                break
+        sim_rewards.append(reward)
+    plt.figure()
+    plt.subplot()
+    plt.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    plt.subplot()
+    plt.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    plt.xlabel('seed')
+    plt.ylabel('reward')
+    plt.show()
 
     env.close()

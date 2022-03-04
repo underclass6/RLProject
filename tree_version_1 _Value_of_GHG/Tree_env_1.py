@@ -113,7 +113,7 @@ class TreeEnv(gym.Env):
 
         if np.all(self.state[:] == -1) or self.year > 10:
             done = True
-            if (self.total_co2reward <= 15000):
+            if (self.total_co2reward <= 13000):
                 reward = -self.total_reward + reward
             self.total_reward = 0
 

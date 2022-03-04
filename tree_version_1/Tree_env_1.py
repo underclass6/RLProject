@@ -21,13 +21,14 @@ class TreeEnv(gym.Env):
         self.state = None
         self.viewer = None
         self.year = 0
-        np.random.seed(2)
+        np.random.seed(0)
         self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self, fix=True):
+    def reset(self, fix=True, seed=0):
         if fix:
             self.state = self._age_fixed.copy()
         else:
+            np.random.seed(seed)
             self.state = np.random.randint(size=100, low=-1, high=8)
         self.year = 0
         return self.state

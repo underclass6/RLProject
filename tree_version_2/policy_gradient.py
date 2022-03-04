@@ -15,8 +15,8 @@ MIN_BATCH_SIZE = 128
 
 env = TreeEnv()
 # env = gym.make('LunarLander-v2')
-env.seed(SEED)
-torch.manual_seed(SEED)
+# env.seed(SEED)
+# torch.manual_seed(SEED)
 
 loss = 0  # global loss var
 
@@ -28,9 +28,9 @@ class Policy(nn.Module):
         super(Policy, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(np.prod(observation_space.shape), hidden_size),
-            nn.ReLU(),
             nn.Linear(hidden_size, 64),
-            nn.ReLU(),
+            nn.Sigmoid(),
+            # nn.ReLU(),
             nn.Linear(64, hidden_size),
             nn.Linear(hidden_size, action_space.n),
             nn.Softmax(dim=0)
@@ -42,7 +42,7 @@ class Policy(nn.Module):
 
 
 policy = Policy(env.observation_space, env.action_space)
-optimizer = optim.Adam(policy.parameters(), lr=1e-5)
+optimizer = optim.Adam(policy.parameters(), lr=1e-4)
 
 
 def compute_returns(rewards, discount_factor=DISCOUNT_FACTOR):
@@ -83,7 +83,7 @@ def policy_gradient(num_episodes):
     for episode in range(num_episodes):
         rewards.append(0)
         trajectory = []
-        state = env.reset(False)
+        state = env.reset()
         state_flatten = state.flatten('F')
 
         for t in range(MAX_EPISODE_LENGTH):
@@ -114,6 +114,27 @@ def policy_gradient(num_episodes):
     return rewards
 
 
+def evaluation(env, fix_seed=True, seed=0):
+    state = env.reset(fix_seed, seed)
+    state_flatten = state.flatten('F')
+
+    current_total_reward = 0
+    for _ in range(1000):
+        # env.render(current_total_reward)
+        action, log_prob = act(state_flatten)
+        next_state, get_reward, done, _, = env.step(action)
+        next_state_flatten = next_state.flatten('F')
+        state_flatten = next_state_flatten
+        current_total_reward += get_reward
+        if done:
+            print(f"with action from q_learning get reward {current_total_reward}")
+            break
+        print(f'state: {state}, action: {action}')
+
+        # time.sleep(2)
+    return current_total_reward
+
+
 if __name__ == "__main__":
     rewards = policy_gradient(10000)
 
@@ -129,3 +150,33 @@ if __name__ == "__main__":
     print(f'Standard deviation: {np.std(rewards)}')
     print(f'Max reward: {np.max(rewards)}')
     print(f'Min reward: {np.min(rewards)}')
+
+    # # evaluation
+    # eval_rewards = []
+    # for seed in range(0, 50):
+    #     r = evaluation(env, False, seed)
+    #     eval_rewards.append(r)
+    #
+    # # random simulation
+    # sim_rewards = []
+    # for seed in range(0, 50):
+    #     obs = env.reset(False, seed)
+    #     current_total_reward = 0
+    #     for _ in range(1000):
+    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
+    #         current_total_reward += reward
+    #         if done:
+    #             break
+    #     sim_rewards.append(reward)
+    # _, ax1 = plt.subplots()
+    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax1.set_xlabel('seed')
+    # ax1.set_ylabel('reward')
+    # _, ax2 = plt.subplots()
+    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    # ax2.set_xlabel('seed')
+    # ax2.set_ylabel('reward')
+    # plt.show()
+
+    env.close()

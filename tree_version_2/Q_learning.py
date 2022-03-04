@@ -1,5 +1,4 @@
 from typing import Tuple, Any, DefaultDict, List
-import dill as pickle
 
 import gym
 import numpy as np
@@ -69,10 +68,10 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
 
     return rewards, Q
 
-def evaluation(env, Q):
-    obs = env.reset()
+def evaluation(env, Q, fix_seed=True, seed=0):
+    obs = env.reset(fix_seed, seed)
 
-    state = tuple(obs)
+    state = tuple(map(tuple, obs))
     current_total_reward = 0
     for _ in range(1000):
         # env.render(current_total_reward)
@@ -84,8 +83,9 @@ def evaluation(env, Q):
             break
         print(f'state: {state}, action: {action}')
 
-        state = tuple(obs)
+        state = tuple(map(tuple, obs))
         # time.sleep(2)
+    return current_total_reward
 
 if __name__ == "__main__":
     # env = gym.make('CartPole-v0')
@@ -114,7 +114,32 @@ if __name__ == "__main__":
     # with open('Q_learning_model.pkl', 'rb') as pkl_handle:
     #     Q = pickle.load(pkl_handle)
 
-    # evaluation
-    evaluation(env, Q)
+    # # evaluation
+    # eval_rewards = []
+    # for seed in range(0, 50):
+    #     r = evaluation(env, Q, False, seed)
+    #     eval_rewards.append(r)
+    #
+    # # random simulation
+    # sim_rewards = []
+    # for seed in range(0, 50):
+    #     obs = env.reset(False, seed)
+    #     current_total_reward = 0
+    #     for _ in range(1000):
+    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
+    #         current_total_reward += reward
+    #         if done:
+    #             break
+    #     sim_rewards.append(reward)
+    # _, ax1 = plt.subplots()
+    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax1.set_xlabel('seed')
+    # ax1.set_ylabel('reward')
+    # _, ax2 = plt.subplots()
+    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    # ax2.set_xlabel('seed')
+    # ax2.set_ylabel('reward')
+    # plt.show()
 
     env.close()

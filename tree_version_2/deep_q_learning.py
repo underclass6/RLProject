@@ -27,13 +27,13 @@ replay_buffer = deque(maxlen=queue_len)  # buffer for replaying
 class Q_Net(nn.Module):
     def __init__(self, env):
         super(Q_Net, self).__init__()
-        print(env.observation_space.shape)
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(np.prod(env.observation_space.shape), 100),
             # nn.Linear(env.observation_space.n, 100),
             nn.ReLU(),
-            # nn.Linear(100, 100),
-            # nn.ReLU(),
+            nn.Linear(100, 100),
+            # nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(100, env.action_space.n)
         )
 
@@ -63,8 +63,15 @@ def make_Q(env) -> nn.Module:
     return Q
 
 
-def policy(Q,  state):
+def policy(Q, env, state, exploration_rate):
+    if np.random.uniform(0, 1) < exploration_rate:
+        return env.action_space.sample()
 
+    # use GPU
+    #     state = torch.from_numpy(state).float()
+    #     state = state.to(device)
+    #     q = Q(state).detach().cpu()
+    #     q_values = q.numpy()
 
     q_values = Q(torch.from_numpy(state).float()).detach().numpy()
     return np.argmax(q_values)
@@ -104,7 +111,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
     if Q is None:
         Q = make_Q(env)
 
-    optimizer = optim.Adam(Q.parameters(), lr=5e-4)
+    optimizer = optim.Adam(Q.parameters(), lr=1e-5)
     rewards = []
     vfa_update_data = []
     for episode in range(num_episodes):
@@ -116,7 +123,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
         for t in range(MAX_EPISODE_LENGTH):
             #             if episode % 100 == 0:
             #                 env.render()
-            action = policy(Q, state_flatten)
+            action = policy(Q, env, state_flatten, exploration_rate)
 
             obs, reward, done, _ = env.step(action)
 
@@ -133,7 +140,7 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
 
                 # replay
                 replay_buffer.append(vfa_update_data)  # enqueue
-                to_replay = np.random.uniform() < 0.5;
+                to_replay = np.random.uniform() < 0.5
                 if to_replay:
                     times = np.random.randint(queue_len)
                     for i in range(times):
@@ -153,44 +160,45 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
     return Q, rewards
 
 
-def Q_evaluate(Q,env):
-    obs = env.reset()
+def Q_evaluate(Q,env, fix_seed=True, seed=0):
+    obs = env.reset(fix_seed, seed)
     state = obs
     state_flatten = state.flatten('F')
 
     total_reward = 0
     print("test now ===============")
     for t in range(11):
-        action = policy(Q, state_flatten)
+        action = policy(Q, env, state_flatten, 0.0)
         obs, reward, done, _ = env.step(action)
         total_reward+=reward
         if done:
             print(f"total reward {total_reward}")
             break
+    return total_reward
 
 if __name__ == "__main__":
     # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
-    # Q, rewards = q_learning(env, 10000)
-    #
-    # _, ax = plt.subplots()
-    # ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
-    # ax.grid()
-    # ax.set_xlabel('episode')
-    # ax.set_ylabel('reward')
-    # plt.title('Version 5 & Deep Q-Learning')
-    # plt.show()
-    #
-    # print(f'Mean reward: {np.mean(rewards)}')
-    # print(f'Standard deviation: {np.std(rewards)}')
-    # print(f'Max reward: {np.max(rewards)}')
-    # print(f'Min reward: {np.min(rewards)}')
+    Q, rewards = q_learning(env, 10000)
 
-    time_start = time.time()
-    Q, rewards=q_learning(env, 10000)
-    time_end = time.time()
-    print("time cost", time_end-time_start,'s')
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 5 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
+
+    # time_start = time.time()
+    # Q, rewards=q_learning(env, 10000)
+    # time_end = time.time()
+    # print("time cost", time_end-time_start,'s')
 
 
 
@@ -198,6 +206,34 @@ if __name__ == "__main__":
     # print("evalu-----------")
     # with torch.no_grad():
     #     Q_evaluate(Q, env)
+
+    # # evaluation
+    # eval_rewards = []
+    # for seed in range(0, 50):
+    #     r = Q_evaluate(Q, env, False, seed)
+    #     eval_rewards.append(r)
+    #
+    # # random simulation
+    # sim_rewards = []
+    # for seed in range(0, 50):
+    #     obs = env.reset(False, seed)
+    #     current_total_reward = 0
+    #     for _ in range(1000):
+    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
+    #         current_total_reward += reward
+    #         if done:
+    #             break
+    #     sim_rewards.append(reward)
+    # _, ax1 = plt.subplots()
+    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax1.set_xlabel('seed')
+    # ax1.set_ylabel('reward')
+    # _, ax2 = plt.subplots()
+    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    # ax2.set_xlabel('seed')
+    # ax2.set_ylabel('reward')
+    # plt.show()
 
 
     env.close()

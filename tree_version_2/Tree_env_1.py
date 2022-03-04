@@ -108,13 +108,14 @@ class TreeEnv(gym.Env):
         self.total_reward = 0
         self.reward_timber = 0
         self.reward_co2reward = 0
-        np.random.seed(0)
+        np.random.seed(2)
         self._age_fixed = np.random.randint(size=100, low=-1, high=8)
 
-    def reset(self, fix=True):
+    def reset(self, fix=True, seed=0):
         if fix:
             age = self._age_fixed
         else:
+            np.random.seed(seed)
             age = np.random.randint(size=100, low=-1, high=8)
         # fertility = np.random.random(100)
         fertility = np.zeros(100)
@@ -217,8 +218,8 @@ class TreeEnv(gym.Env):
         if self.reward_timber <= minimum_req_timber_1year:
             reward = -200
 
-        print_info(action, reward, self.reward_timber, self.reward_co2reward, self.year, self.total_reward_timber,
-                   self.total_co2reward, self.state)
+        # print_info(action, reward, self.reward_timber, self.reward_co2reward, self.year, self.total_reward_timber,
+        #            self.total_co2reward, self.state)
         return self.state, reward, done, meta_info   # , self.total_co2reward
 
     def render(self, current_total_reward=0):

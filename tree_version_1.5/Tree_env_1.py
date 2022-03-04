@@ -1,3 +1,5 @@
+import math
+
 import gym
 from gym import spaces
 import numpy as np
@@ -20,10 +22,14 @@ import random
 # '7': 35,
 # }
 max_fertility = 3
-value_of_tree_fn = lambda x: 0 if x == -1 else x ** 2  # calculate the value of tree wrt. age
-value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else x ** 2.5  # calculate this ability wrt. age
+# value_of_tree_fn = lambda x: 0 if x == -1 else x ** 2  # calculate the value of tree wrt. age
+# value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else x ** 2.5  # calculate this ability wrt. age
+# tree_growth_fn = lambda x: x / max_fertility  # calculate the ability of growth of tree wrt. fertility
+# absorb_fertility_ability_fn = lambda x: 0.1 * x  # calculate the absorbency of tree wrt. age
+value_of_tree_fn = lambda x: 0 if x == -1 else math.pi*((0.5*x) ** 2)  # calculate the value of tree wrt. age 1，4，9，16,25,36,49
+value_of_greenhouse_gas_uptake_fn = lambda x: 0 if x == -1 else (x * 10)  # calculate this ability wrt. age * 10,  10 20 30 40 50 60 70
 tree_growth_fn = lambda x: x / max_fertility  # calculate the ability of growth of tree wrt. fertility
-absorb_fertility_ability_fn = lambda x: 0.1 * x  # calculate the absorbency of tree wrt. age
+absorb_fertility_ability_fn = lambda x: 0.05 * x  # calculate the absorbency of tree wrt. age
 
 
 class TreeEnv(gym.Env):
