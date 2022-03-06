@@ -74,18 +74,15 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
 
 
 if __name__ == "__main__":
-    # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
     rewards, Q, _ = q_learning(env, 10000)
 
     _, ax = plt.subplots()
     ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
-    # ax.step([i for i in range(1, len(rewards) + 1)], GHGs, linewidth=0.5)
     ax.grid()
     ax.set_xlabel('episode')
     ax.set_ylabel('reward')
-    # plt.legend(['reward', 'CO2 absorbency'])
     plt.title('Version 4 & Q-Learning')
     plt.show()
 
@@ -93,10 +90,6 @@ if __name__ == "__main__":
     print(f'Standard deviation: {np.std(rewards)}')
     print(f'Max reward: {np.max(rewards)}')
     print(f'Min reward: {np.min(rewards)}')
-    # print(f'Mean CO2 absorbency: {np.mean(GHGs)}')
-    # print(f'Standard deviation: {np.std(GHGs)}')
-    # print(f'Max CO2 absorbency: {np.max(GHGs)}')
-    # print(f'Min CO2 absorbency: {np.min(GHGs)}')
 
     # simulate agent after training
     obs = env.reset()

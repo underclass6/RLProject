@@ -16,12 +16,6 @@ DISCOUNT_FACTOR = 1
 BINS = 20
 NUM_STATES = BINS ** 4
 
-# CART_POSITION = np.linspace(-4.8, 4.8, BINS)
-# CART_VELOCITY = np.linspace(-1, 1, BINS)
-# POLE_ANGLE = np.linspace(-0.418, 0.418, BINS)
-# POLE_ANGULAR_VELOCITY = np.linspace(-3, 3, BINS)
-
-
 
 def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, exploration_rate: float) -> int:
     if np.random.uniform(0, 1) < exploration_rate:
@@ -88,18 +82,12 @@ def evaluation(env, Q, fix_seed=True, seed=0):
     return current_total_reward
 
 if __name__ == "__main__":
-    # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
     time_start = time.time()
     rewards, Q = q_learning(env, 100000)
     time_end = time.time()
     print("time cost", time_end-time_start,'s')
-
-
-    # save model
-    # with open('Q_learning_model.pkl', 'wb') as pkl_handle:
-    #     pickle.dump(Q, pkl_handle)
 
     _, ax = plt.subplots()
     ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
@@ -114,36 +102,32 @@ if __name__ == "__main__":
     print(f'Max reward: {np.max(rewards)}')
     print(f'Min reward: {np.min(rewards)}')
 
-    # read model from file
-    # with open('Q_learning_model.pkl', 'rb') as pkl_handle:
-    #     Q = pickle.load(pkl_handle)
+    # evaluation
+    eval_rewards = []
+    for seed in range(0, 50):
+        r = evaluation(env, Q, False, seed)
+        eval_rewards.append(r)
 
-    # # evaluation
-    # eval_rewards = []
-    # for seed in range(0, 50):
-    #     r = evaluation(env, Q, False, seed)
-    #     eval_rewards.append(r)
-    #
-    # # random simulation
-    # sim_rewards = []
-    # for seed in range(0, 50):
-    #     obs = env.reset(False, seed)
-    #     current_total_reward = 0
-    #     for _ in range(1000):
-    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
-    #         current_total_reward += reward
-    #         if done:
-    #             break
-    #     sim_rewards.append(reward)
-    # _, ax1 = plt.subplots()
-    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax1.set_xlabel('seed')
-    # ax1.set_ylabel('reward')
-    # _, ax2 = plt.subplots()
-    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
-    # ax2.set_xlabel('seed')
-    # ax2.set_ylabel('reward')
-    # plt.show()
+    # random simulation
+    sim_rewards = []
+    for seed in range(0, 50):
+        obs = env.reset(False, seed)
+        current_total_reward = 0
+        for _ in range(1000):
+            obs, reward, done, _ = env.step(np.random.randint(0, 8))
+            current_total_reward += reward
+            if done:
+                break
+        sim_rewards.append(reward)
+    _, ax1 = plt.subplots()
+    ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax1.set_xlabel('seed')
+    ax1.set_ylabel('reward')
+    _, ax2 = plt.subplots()
+    ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    ax2.set_xlabel('seed')
+    ax2.set_ylabel('reward')
+    plt.show()
 
     env.close()

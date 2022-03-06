@@ -39,38 +39,17 @@ class TreeEnv(gym.Env):
             reward = 0
 
         elif action >= 1 and action <= 7:
-            # 遍历砍掉对应所有年份的树
+            # cut all trees with specified aged
             reward = 0
             for i in range(100):
                 if (self.state[i] == action):
                     self.state[i] = -1
                     reward += value_of_tree[action]
 
-        # elif action == 2:
-        #     reward=0
-        #     for i in range(100):
-        #         if(self.state[i]==action):
-        #             self.state[i]=0
-        #             reward += value_of_tree[action]
-        #
-        # elif action == 3:
-        #     reward=0
-        #     for i in range(100):
-        #         if(self.state[i]==action):
-        #             self.state[i]=0
-        #             reward += value_of_tree[action]
-        #
-        # elif action == 4:
-        #     reward=0
-        #     for i in range(100):
-        #         if(self.state[i]==action):
-        #             self.state[i]=0
-        #             reward += value_of_tree[action]
-
         done = False
 
         self.year += 1
-        # 树木生长，7年树播种
+        # trees grow, up to 7
         for i in range(100):
             if (self.state[i] != -1) and (self.state[i] != 7):
                 self.state[i] += 1

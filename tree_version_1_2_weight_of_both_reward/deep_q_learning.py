@@ -155,7 +155,6 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
 
 
 if __name__ == "__main__":
-    # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
     Q, rewards = q_learning(env, 10000)

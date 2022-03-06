@@ -16,12 +16,6 @@ DISCOUNT_FACTOR = 1
 BINS = 20
 NUM_STATES = BINS ** 4
 
-# CART_POSITION = np.linspace(-4.8, 4.8, BINS)
-# CART_VELOCITY = np.linspace(-1, 1, BINS)
-# POLE_ANGLE = np.linspace(-0.418, 0.418, BINS)
-# POLE_ANGULAR_VELOCITY = np.linspace(-3, 3, BINS)
-
-
 
 def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, exploration_rate: float) -> int:
     if np.random.uniform(0, 1) < exploration_rate:
@@ -74,7 +68,6 @@ Tuple[List[float], DefaultDict[Tuple[Any, int], float]]:
 
 
 if __name__ == "__main__":
-    # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
     rewards, Q, GHGs = q_learning(env, 10000)

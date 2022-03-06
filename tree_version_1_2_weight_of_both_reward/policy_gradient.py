@@ -14,7 +14,6 @@ SEED = 0
 MIN_BATCH_SIZE = 256
 
 env = TreeEnv()
-# env = gym.make('LunarLander-v2')
 
 loss = 0  # global loss var
 

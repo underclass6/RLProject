@@ -14,7 +14,6 @@ SEED = 0
 MIN_BATCH_SIZE = 256
 
 env = TreeEnv()
-# env = gym.make('LunarLander-v2')
 
 loss = 0  # global loss var
 
@@ -128,23 +127,23 @@ def evaluation(env, fix_seed=True, seed=0):
     return current_total_reward
 
 if __name__ == "__main__":
-    # rewards = policy_gradient(10000)
-    #
-    # # save model
-    # torch.save(policy.state_dict(), 'policy_gradient_model')
-    #
-    # _, ax = plt.subplots()
-    # ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
-    # ax.grid()
-    # ax.set_xlabel('episode')
-    # ax.set_ylabel('reward')
-    # plt.title('Version 1 & Policy Gradient')
-    # plt.show()
-    #
-    # print(f'Mean reward: {np.mean(rewards)}')
-    # print(f'Standard deviation: {np.std(rewards)}')
-    # print(f'Max reward: {np.max(rewards)}')
-    # print(f'Min reward: {np.min(rewards)}')
+    rewards = policy_gradient(10000)
+
+    # save model
+    torch.save(policy.state_dict(), 'policy_gradient_model')
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 1 & Policy Gradient')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
 
     # read model
     policy = Policy(env.observation_space, env.action_space)

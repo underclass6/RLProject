@@ -175,26 +175,25 @@ def evaluation(env, Q, fix_seed=True, seed=0):
 
 
 if __name__ == "__main__":
-    # env = gym.make('LunarLander-v2')
     env = TreeEnv()
-    # obs = env.reset()
-    # Q, rewards = q_learning(env, 10000)
-    #
-    # # save model
-    # torch.save(Q.state_dict(), 'deep_q_learning_model')
-    #
-    # _, ax = plt.subplots()
-    # ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
-    # ax.grid()
-    # ax.set_xlabel('episode')
-    # ax.set_ylabel('reward')
-    # plt.title('Version 1 & Deep Q-Learning')
-    # plt.show()
-    #
-    # print(f'Mean reward: {np.mean(rewards)}')
-    # print(f'Standard deviation: {np.std(rewards)}')
-    # print(f'Max reward: {np.max(rewards)}')
-    # print(f'Min reward: {np.min(rewards)}')
+    obs = env.reset()
+    Q, rewards = q_learning(env, 10000)
+
+    # save model
+    torch.save(Q.state_dict(), 'deep_q_learning_model')
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=1.0)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 1 & Deep Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
 
     # read model
     Q = Q_Net(env)

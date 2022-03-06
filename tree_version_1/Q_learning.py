@@ -16,11 +16,6 @@ DISCOUNT_FACTOR = 1
 BINS = 20
 NUM_STATES = BINS ** 4
 
-# CART_POSITION = np.linspace(-4.8, 4.8, BINS)
-# CART_VELOCITY = np.linspace(-1, 1, BINS)
-# POLE_ANGLE = np.linspace(-0.418, 0.418, BINS)
-# POLE_ANGULAR_VELOCITY = np.linspace(-3, 3, BINS)
-
 
 
 def policy(env: gym.Env, Q: DefaultDict[Tuple[Any, int], float], state, exploration_rate: float) -> int:
@@ -91,27 +86,26 @@ def evaluation(env, Q, fix_seed=True, seed=0):
 
 
 if __name__ == "__main__":
-    # env = gym.make('CartPole-v0')
     env = TreeEnv()
 
-    # rewards, Q = q_learning(env, 10000)
-    #
-    # # save model
-    # with open('Q_learning_model.pkl', 'wb') as pkl_handle:
-    #     pickle.dump(Q, pkl_handle)
-    #
-    # _, ax = plt.subplots()
-    # ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
-    # ax.grid()
-    # ax.set_xlabel('episode')
-    # ax.set_ylabel('reward')
-    # plt.title('Version 1 & Q-Learning')
-    # plt.show()
-    #
-    # print(f'Mean reward: {np.mean(rewards)}')
-    # print(f'Standard deviation: {np.std(rewards)}')
-    # print(f'Max reward: {np.max(rewards)}')
-    # print(f'Min reward: {np.min(rewards)}')
+    rewards, Q = q_learning(env, 10000)
+
+    # save model
+    with open('Q_learning_model.pkl', 'wb') as pkl_handle:
+        pickle.dump(Q, pkl_handle)
+
+    _, ax = plt.subplots()
+    ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
+    ax.grid()
+    ax.set_xlabel('episode')
+    ax.set_ylabel('reward')
+    plt.title('Version 1 & Q-Learning')
+    plt.show()
+
+    print(f'Mean reward: {np.mean(rewards)}')
+    print(f'Standard deviation: {np.std(rewards)}')
+    print(f'Max reward: {np.max(rewards)}')
+    print(f'Min reward: {np.min(rewards)}')
 
     # read model from file
     with open('Q_learning_model.pkl', 'rb') as pkl_handle:

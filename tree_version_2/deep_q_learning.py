@@ -177,7 +177,6 @@ def Q_evaluate(Q,env, fix_seed=True, seed=0):
     return total_reward
 
 if __name__ == "__main__":
-    # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset()
     Q, rewards = q_learning(env, 10000)
@@ -200,40 +199,33 @@ if __name__ == "__main__":
     # time_end = time.time()
     # print("time cost", time_end-time_start,'s')
 
+    # evaluation
+    eval_rewards = []
+    for seed in range(0, 50):
+        r = Q_evaluate(Q, env, False, seed)
+        eval_rewards.append(r)
 
-
-    # Q.eval()
-    # print("evalu-----------")
-    # with torch.no_grad():
-    #     Q_evaluate(Q, env)
-
-    # # evaluation
-    # eval_rewards = []
-    # for seed in range(0, 50):
-    #     r = Q_evaluate(Q, env, False, seed)
-    #     eval_rewards.append(r)
-    #
-    # # random simulation
-    # sim_rewards = []
-    # for seed in range(0, 50):
-    #     obs = env.reset(False, seed)
-    #     current_total_reward = 0
-    #     for _ in range(1000):
-    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
-    #         current_total_reward += reward
-    #         if done:
-    #             break
-    #     sim_rewards.append(reward)
-    # _, ax1 = plt.subplots()
-    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax1.set_xlabel('seed')
-    # ax1.set_ylabel('reward')
-    # _, ax2 = plt.subplots()
-    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
-    # ax2.set_xlabel('seed')
-    # ax2.set_ylabel('reward')
-    # plt.show()
+    # random simulation
+    sim_rewards = []
+    for seed in range(0, 50):
+        obs = env.reset(False, seed)
+        current_total_reward = 0
+        for _ in range(1000):
+            obs, reward, done, _ = env.step(np.random.randint(0, 8))
+            current_total_reward += reward
+            if done:
+                break
+        sim_rewards.append(reward)
+    _, ax1 = plt.subplots()
+    ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax1.set_xlabel('seed')
+    ax1.set_ylabel('reward')
+    _, ax2 = plt.subplots()
+    ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    ax2.set_xlabel('seed')
+    ax2.set_ylabel('reward')
+    plt.show()
 
 
     env.close()

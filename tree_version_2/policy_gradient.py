@@ -14,9 +14,6 @@ SEED = 0
 MIN_BATCH_SIZE = 128
 
 env = TreeEnv()
-# env = gym.make('LunarLander-v2')
-# env.seed(SEED)
-# torch.manual_seed(SEED)
 
 loss = 0  # global loss var
 
@@ -155,32 +152,32 @@ if __name__ == "__main__":
     print(f'Max reward: {np.max(rewards)}')
     print(f'Min reward: {np.min(rewards)}')
 
-    # # evaluation
-    # eval_rewards = []
-    # for seed in range(0, 50):
-    #     r = evaluation(env, False, seed)
-    #     eval_rewards.append(r)
-    #
-    # # random simulation
-    # sim_rewards = []
-    # for seed in range(0, 50):
-    #     obs = env.reset(False, seed)
-    #     current_total_reward = 0
-    #     for _ in range(1000):
-    #         obs, reward, done, _ = env.step(np.random.randint(0, 8))
-    #         current_total_reward += reward
-    #         if done:
-    #             break
-    #     sim_rewards.append(reward)
-    # _, ax1 = plt.subplots()
-    # ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax1.set_xlabel('seed')
-    # ax1.set_ylabel('reward')
-    # _, ax2 = plt.subplots()
-    # ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
-    # ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
-    # ax2.set_xlabel('seed')
-    # ax2.set_ylabel('reward')
-    # plt.show()
+    # evaluation
+    eval_rewards = []
+    for seed in range(0, 50):
+        r = evaluation(env, False, seed)
+        eval_rewards.append(r)
+
+    # random simulation
+    sim_rewards = []
+    for seed in range(0, 50):
+        obs = env.reset(False, seed)
+        current_total_reward = 0
+        for _ in range(1000):
+            obs, reward, done, _ = env.step(np.random.randint(0, 8))
+            current_total_reward += reward
+            if done:
+                break
+        sim_rewards.append(reward)
+    _, ax1 = plt.subplots()
+    ax1.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax1.set_xlabel('seed')
+    ax1.set_ylabel('reward')
+    _, ax2 = plt.subplots()
+    ax2.bar([i for i in range(len(eval_rewards))], eval_rewards)
+    ax2.bar([i for i in range(len(eval_rewards))], sim_rewards)
+    ax2.set_xlabel('seed')
+    ax2.set_ylabel('reward')
+    plt.show()
 
     env.close()

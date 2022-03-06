@@ -120,8 +120,8 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
         state_flatten = state.flatten('F')
 
         for t in range(MAX_EPISODE_LENGTH):
-#             if episode % 100 == 0:
-#                 env.render()
+            # if episode % 100 == 0:
+            #     env.render()
             action = policy(Q, env, state_flatten, exploration_rate)
 
             obs, reward, done, _, GHG = env.step(action)
@@ -164,14 +164,12 @@ def q_learning(env, num_episodes, exploration_rate=0.9, exploration_rate_decay=0
 
 
 if __name__ == "__main__":
-    # env = gym.make('LunarLander-v2')
     env = TreeEnv()
     obs = env.reset(0)
     Q, rewards = q_learning(env, 10000)
 
     _, ax = plt.subplots()
     ax.step([i for i in range(1, len(rewards) + 1)], rewards, linewidth=0.5)
-    # ax.step([i for i in range(1, len(rewards) + 1)], GHGs, linewidth=0.5)
     ax.grid()
     ax.set_xlabel('episode')
     ax.set_ylabel('reward')
@@ -183,9 +181,5 @@ if __name__ == "__main__":
     print(f'Standard deviation: {np.std(rewards)}')
     print(f'Max reward: {np.max(rewards)}')
     print(f'Min reward: {np.min(rewards)}')
-    # print(f'Mean CO2 absorbency: {np.mean(GHGs)}')
-    # print(f'Standard deviation: {np.std(GHGs)}')
-    # print(f'Max CO2 absorbency: {np.max(GHGs)}')
-    # print(f'Min CO2 absorbency: {np.min(GHGs)}')
 
     env.close()
