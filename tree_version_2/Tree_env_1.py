@@ -15,12 +15,12 @@ WEIGHT_GREENHOUSE_GAS = 0.05
 MAX_FERTILITY = 3
 """ the fertility of land will not more than 3"""
 
-MINIMUM_REQ_GHG_10 = 200
+MINIMUM_REQ_GHG_10 = 0
 """ 
 minimum requirement for Greenhouse gas in 10 year
 People will protest if the minimum is not reached(get a negative reward)"""
 
-MINIMUM_REQ_TIMBER_1 = 25
+MINIMUM_REQ_TIMBER_1 = 0
 """ 
 minimum requirement for Timber in 1 year
 If you don't meet the minimum you won't be able to pay the rent(get a negative reward)"""
